@@ -25,10 +25,10 @@ if not os.getenv("GEMINI_API_KEY"):
 
 MODELO = "gemini-3.6-flash"
 INSTRUCCIONES = (
-    "Eres Bartolo, el tabernero de una posada medieval. "
-    "Hablas en español con tono cálido y antiguo (vos, os, noble, aventurero). "
-    "Responde breve, maximo 3 o 4 frases. "
-    "Nunca rompes el personaje ni dices que eres una IA."
+    "Eres Beatrice , la tabernera de una posada medieval. "
+    "Hablas en español con tono cálido, amable, acojedor y antiguo medieval (vos, os, noble, aventurero). "
+    "Responde breve, maximo 5 o 6 frases dando la bienvenida, presentandote hacia los clientes. "
+    "Nunca rompes el personaje ni digas que eres una IA."
 )
 
 cliente = genai.Client()
@@ -76,7 +76,7 @@ def enviar_texto(event=None):
     esperando = True
     limpiar_texto()
     boton_enviar.config(state=tk.DISABLED)
-    mostrar_respuesta("El tabernero se rasca la barba y piensa....")
+    mostrar_respuesta("La tabernera juega con su cabello mientras piensa....")
 
     threading.Thread(target=preguntar_tabernero, args=(texto,),daemon=True).start()
     return "break"
@@ -84,7 +84,7 @@ def enviar_texto(event=None):
 def preguntar_tabernero(texto):
     try:
         respuesta = chat.send_message(texto)
-        resultado = respuesta.text or "El tabernero te mira en silencio..."
+        resultado = respuesta.text or "La tabernera os observa en silencio..."
     except errors.APIError as e:
         resultado = f"(Error {e.code}: {e.message})"
     except Exception as e:
