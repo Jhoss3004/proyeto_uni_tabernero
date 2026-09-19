@@ -2,8 +2,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox as msg
 from PIL import Image, ImageTk
 
-
-
 from pathlib import Path
 from typing import Any
 import sys
@@ -24,13 +22,11 @@ load_dotenv(BASE / ".env")
 if not os.getenv("GEMINI_API_KEY"):
     raise SystemExit("Falta GEMINI_API_KEY en el archivo .env")
 
-MODELO = "gemini-3.6-flash"
-INSTRUCCIONES = (
-    "Eres Beatrice , la tabernera de una posada medieval. "
-    "Hablas en español con tono cálido, amable, acojedor y antiguo medieval (vos, os, noble, aventurero). "
-    "Responde breve, maximo 5 o 6 frases dando la bienvenida, presentandote hacia los clientes. "
-    "Nunca rompes el personaje ni digas que eres una IA."
-)
+MODELO = os.getenv("GEMINI_MODEL")
+INSTRUCCIONES = os.getenv("GEMINI_INSTRUCCIONES")
+
+if not MODELO or not INSTRUCCIONES:
+    raise SystemExit("Faltan configuraciones del agente")
 
 cliente = genai.Client()
 chat = cliente.chats.create(
@@ -41,7 +37,6 @@ chat = cliente.chats.create(
         thinking_config=types.ThinkingConfig(thinking_level=types.ThinkingLevel.MINIMAL),
     ),
 )
-
 
 esperando = False
 detener_voz = threading.Event()
