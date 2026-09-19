@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox as msg
 from PIL import Image, ImageTk
+
 
 
 from pathlib import Path
@@ -43,7 +44,7 @@ chat = cliente.chats.create(
 
 
 esperando = False
-
+detener_voz = threading.Event()
 
 estilo_boton = dict[str, Any](
     bg="#4e3525",
@@ -70,7 +71,11 @@ def mostrar_respuesta(respuesta):
 def enviar_texto(event=None):
     global esperando
     texto = cuadro_texto.get("1.0", tk.END).strip()
-    if not texto or esperando:
+    if not texto:
+        msg.showwarning(title="¡Pero Preguntad Algo!",message="¿A caso solo entraste a ver?")
+        return "break"
+    elif esperando:
+        msg.showwarning(title="¡Un momento!",message="Dejadme Pensar...")
         return "break"
 
     esperando = True
@@ -104,6 +109,10 @@ def recibir_respuesta(resultado):
 
 def limpiar_texto():
     cuadro_texto.delete("1.0", tk.END)
+    detener_voz.set()
+
+    respuesta = "Bienvenido a mi taberna. ¿En qué os puedo ayudar, noble aventurero?"
+    mostrar_respuesta(respuesta)
 
 def salto_linea(event=None):
     cuadro_texto.insert(tk.INSERT, "\n")
@@ -164,11 +173,20 @@ def confirmar_cierre():
     ):
         ventana.destroy() """
 
+
 def hablar(texto):
+    detener_voz.clear()
     motor = pyttsx3.init()
-    motor.setProperty("rate", 160)
+    motor.setProperty("rate", 180)
+
+    def on_word(name, location, length):
+        if detener_voz.is_set():
+            motor.stop()
+
+    motor.connect("started-word", on_word)
     motor.say(texto)
     motor.runAndWait()
+
 ventana = tk.Tk()
 ventana.title("La Taberna")
 ventana.geometry("960x540+290+130")
